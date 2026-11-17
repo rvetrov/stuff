@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>5 букв — помощник</title>
+    <meta name="description" content="Помощник для игры «5 букв»: подходящие слова и лучший следующий ход." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%236aaa64'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'%3EА%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <p class="back"><a href="../">← Назад</a></p>
+      <h1>5 букв</h1>
+      <p class="lead">Введи слово из игры и раскрась буквы, как в ней: нажимай на букву, чтобы сменить цвет.</p>
+
+      <form id="guess-form" autocomplete="off">
+        <label for="guess-input" class="sr-only">Слово из пяти букв</label>
+        <input id="guess-input" type="text" maxlength="5" placeholder="Слово из 5 букв" spellcheck="false" autocapitalize="none" />
+        <button type="submit">Добавить</button>
+      </form>
+      <p id="form-error" class="error" role="alert" hidden></p>
+
+      <section aria-label="Попытки">
+        <div id="rows"></div>
+      </section>
+
+      <section aria-labelledby="h-suggest">
+        <h2 id="h-suggest">Лучший следующий ход</h2>
+        <p class="hint">Сколько слов останется в среднем. ✓ — слово может быть ответом.</p>
+        <ol id="suggestions" class="suggestions"></ol>
+      </section>
+
+      <section aria-labelledby="h-candidates">
+        <h2 id="h-candidates">Подходящие слова: <span id="count">…</span></h2>
+        <div id="candidates" class="chips"></div>
+      </section>
+
+      <footer>
+        <p id="dict-status">Словарь загружается…</p>
+        <p>
+          <label class="file">
+            Свой словарь
+            <input id="dict-file" type="file" accept=".txt,text/plain" />
+          </label>
+          <button id="dict-restore" type="button" class="link" hidden>Вернуть стандартный</button>
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
