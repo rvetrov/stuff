@@ -38,7 +38,7 @@ body {
 }
 
 main {
-  max-width: 640px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 24px 16px 48px;
 }
@@ -171,22 +171,33 @@ button {
   border-radius: 50%;
 }
 
-.suggestions {
+.legend {
+  margin-top: 24px;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 32px;
+}
+
+.list {
   margin: 0;
   padding: 0;
   list-style: none;
   display: grid;
   gap: 6px;
+  justify-content: start;
 }
 
-.suggestions li {
-  display: flex;
+.list li {
+  display: grid;
+  grid-template-columns: 5.5em auto;
   align-items: baseline;
   gap: 12px;
 }
 
-.suggestions .word,
-.chip {
+.word {
   font: inherit;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -197,29 +208,21 @@ button {
   padding: 4px 10px;
 }
 
-.suggestions .meta {
+.list li.meta {
+  display: block;
+}
+
+.list .word {
+  width: 100%;
+}
+
+.word:hover {
+  border-color: var(--accent);
+}
+
+.meta {
   color: var(--muted);
   font-size: 0.9rem;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.chip {
-  font-weight: 500;
-}
-
-.more {
-  color: var(--muted);
-  align-self: center;
-}
-
-.word:hover,
-.chip:hover {
-  border-color: var(--accent);
 }
 
 footer {
@@ -256,6 +259,12 @@ footer p {
   background: none;
   border: 0;
   text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .cols {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 420px) {

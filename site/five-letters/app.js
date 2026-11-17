@@ -9,7 +9,8 @@ import {
   rankGuesses,
 } from "./solver.js";
 
-const MAX_CHIPS = 200;
+const MAX_SHOWN = 100; // сколько подходящих слов показывать
+const MAX_SUGGESTIONS = 8;
 const COLOR_NAMES = ["серая", "жёлтая", "зелёная"];
 
 const el = {
@@ -83,64 +84,65 @@ function renderRows() {
   );
 }
 
-function wordButton(word, className) {
+function wordButton(word) {
   const b = document.createElement("button");
   b.type = "button";
-  b.className = className;
+  b.className = "word";
   b.textContent = word;
-  b.title = "Подставить в поле ввода";
-  b.addEventListener("click", () => {
-    el.input.value = word;
-    el.input.focus();
-  });
+  b.title = "Добавить в попытки";
+  b.addEventListener("click", () => addRow(word));
   return b;
 }
 
-function renderCandidates(candidates) {
-  el.count.textContent = candidates.length;
-  const shown = candidates.slice(0, MAX_CHIPS).map((i) => wordButton(index.words[i], "chip"));
-  const nodes = [...shown];
-  if (candidates.length > MAX_CHIPS) {
-    const more = document.createElement("span");
-    more.className = "more";
-    more.textContent = `…и ещё ${candidates.length - MAX_CHIPS}`;
-    nodes.push(more);
+function formatExpected(x) {
+  return x < 10 ? x.toFixed(2) : String(Math.round(x));
+}
+
+// Строка списка: слово и (если посчитано) сколько слов в среднем останется.
+function listItem(word, expected, mark) {
+  const li = document.createElement("li");
+  li.append(wordButton(word));
+  if (expected != null) {
+    const meta = document.createElement("span");
+    meta.className = "meta";
+    meta.textContent = (mark ? "✓ " : "") + formatExpected(expected);
+    li.append(meta);
   }
-  if (candidates.length === 0 && rows.length > 0) {
-    const none = document.createElement("span");
-    none.className = "more";
-    none.textContent = "Ничего не подходит. Проверь цвета.";
-    nodes.push(none);
-  }
+  return li;
+}
+
+function note(text) {
+  const li = document.createElement("li");
+  li.className = "meta";
+  li.textContent = text;
+  return li;
+}
+
+// items — [{ word, expected? }], уже отсортированные.
+function renderCandidates(items) {
+  el.count.textContent = items.length;
+  const nodes = items.slice(0, MAX_SHOWN).map((c) => listItem(c.word, c.expected));
+  if (items.length > MAX_SHOWN) nodes.push(note(`…и ещё ${items.length - MAX_SHOWN}`));
+  if (items.length === 0 && rows.length > 0) nodes.push(note("Ничего не подходит. Проверь цвета."));
   el.candidates.replaceChildren(...nodes);
 }
 
 function renderSuggestions(list) {
-  el.suggestions.replaceChildren(
-    ...list.map((s) => {
-      const li = document.createElement("li");
-      const meta = document.createElement("span");
-      meta.className = "meta";
-      const left = s.expected < 10 ? s.expected.toFixed(2) : Math.round(s.expected);
-      meta.textContent = `${s.isCandidate ? "✓ " : ""}в среднем останется ${left}`;
-      li.append(wordButton(s.word, "word"), meta);
-      return li;
-    }),
-  );
+  el.suggestions.replaceChildren(...list.map((s) => listItem(s.word, s.expected, s.isCandidate)));
 }
 
-async function updateSuggestions(candidates) {
+// Считает силу каждого слова и обновляет оба списка. Устаревшие расчёты отбрасываются.
+async function updateRanking(candidates) {
   const my = ++runId;
   if (candidates.length === 0) {
     el.suggestions.replaceChildren();
     return;
   }
-  const status = document.createElement("li");
-  status.className = "meta";
-  status.textContent = "Считаю…";
-  el.suggestions.replaceChildren(status);
-  const list = await rankGuesses(index, candidates, { top: 8, shouldCancel: () => my !== runId });
-  if (list && my === runId) renderSuggestions(list);
+  el.suggestions.replaceChildren(note("Считаю…"));
+  const ranked = await rankGuesses(index, candidates, { shouldCancel: () => my !== runId });
+  if (!ranked || my !== runId) return;
+  renderSuggestions(ranked.slice(0, MAX_SUGGESTIONS));
+  renderCandidates(ranked.filter((r) => r.isCandidate));
 }
 
 function update() {
@@ -148,8 +150,14 @@ function update() {
   renderRows();
   const tries = rows.map((r) => ({ word: r.word, pattern: encodePattern(r.colors) }));
   const candidates = filterCandidates(index, tries);
-  renderCandidates(candidates);
-  updateSuggestions(candidates);
+  // Пока идёт расчёт, показываем кандидатов в порядке словаря.
+  renderCandidates(candidates.map((i) => ({ word: index.words[i] })));
+  updateRanking(candidates);
+}
+
+function addRow(word) {
+  rows.push({ word, colors: Array(WORD_LEN).fill(0) });
+  update();
 }
 
 // ---- Ввод ----
@@ -168,9 +176,8 @@ el.form.addEventListener("submit", (e) => {
     return;
   }
   showError(null);
-  rows.push({ word, colors: Array(WORD_LEN).fill(0) });
   el.input.value = "";
-  update();
+  addRow(word);
 });
 
 el.input.addEventListener("input", () => showError(null));

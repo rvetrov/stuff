@@ -120,12 +120,12 @@ export function filterCandidates(index, tries) {
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 /**
- * Лучшие следующие ходы. Для каждого слова словаря считается, на сколько групп оно разбивает кандидатов
- * и сколько кандидатов в среднем останется (сумма квадратов размеров групп / число кандидатов).
+ * Все слова словаря, отсортированные по силе хода. Для каждого слова считается, на сколько групп оно
+ * разбивает кандидатов и сколько кандидатов в среднем останется (сумма квадратов размеров групп / число кандидатов).
  * Чем меньше, тем лучше. При равенстве предпочитаются слова, которые сами могут быть ответом.
  * Возвращает null, если shouldCancel() стал true по ходу вычислений.
  */
-export async function rankGuesses(index, candidates, { top = 8, shouldCancel = () => false } = {}) {
+export async function rankGuesses(index, candidates, { shouldCancel = () => false } = {}) {
   const { words, codes } = index;
   const total = candidates.length;
   if (total === 0) return [];
@@ -159,5 +159,5 @@ export async function rankGuesses(index, candidates, { top = 8, shouldCancel = (
   }
 
   scored.sort((x, y) => x.expected - y.expected || Number(y.isCandidate) - Number(x.isCandidate));
-  return scored.slice(0, top);
+  return scored;
 }

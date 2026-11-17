@@ -66,7 +66,7 @@ test("rankGuesses: на встроенном словаре лучший пер�
   const words = parseDictionary(readFileSync(new URL("./words.txt", import.meta.url), "utf8"));
   const index = createIndex(words);
   const all = words.map((_, i) => i);
-  const [best] = await rankGuesses(index, all, { top: 1 });
+  const [best] = await rankGuesses(index, all);
   assert.equal(best.word, "норка");
   assert.ok(Math.abs(best.expected - 101.45) < 0.1, `expected ≈101.45, получили ${best.expected}`);
 });

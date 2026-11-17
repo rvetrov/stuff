@@ -25,16 +25,18 @@
         <div id="rows"></div>
       </section>
 
-      <section aria-labelledby="h-suggest">
-        <h2 id="h-suggest">Лучший следующий ход</h2>
-        <p class="hint">Сколько слов останется в среднем. ✓ — слово может быть ответом.</p>
-        <ol id="suggestions" class="suggestions"></ol>
-      </section>
+      <p class="hint legend">Число — сколько слов останется в среднем после этого слова. ✓ — слово может быть ответом.</p>
+      <div class="cols">
+        <section aria-labelledby="h-suggest">
+          <h2 id="h-suggest">Лучшие ходы</h2>
+          <ol id="suggestions" class="list"></ol>
+        </section>
 
-      <section aria-labelledby="h-candidates">
-        <h2 id="h-candidates">Подходящие слова: <span id="count">…</span></h2>
-        <div id="candidates" class="chips"></div>
-      </section>
+        <section aria-labelledby="h-candidates">
+          <h2 id="h-candidates">Подходящие слова: <span id="count">…</span></h2>
+          <ol id="candidates" class="list"></ol>
+        </section>
+      </div>
 
       <footer>
         <p id="dict-status">Словарь загружается…</p>
